@@ -10,11 +10,14 @@ import (
 	"os"
 	"sync/atomic"
 	"time"
+	"bytes"
+	"strconv"
 )
 
 const (
 	rawLength     = 12
 	encodedLength = 20
+	numeralLength = rawLength * 3
 	charset       = "0123456789abcdefghijklmnopqrstuv"
 )
 
@@ -48,22 +51,16 @@ func (s *Source) Seed(pos uint32) {
 }
 
 func (s *Source) NewID() ID {
-	var id ID
 
-	i := atomic.AddUint32(&s.counter, 1)
+	i, id := atomic.AddUint32(&s.counter, 1), ID{}
 
-	id[9] = byte(i >> 16)
-	id[10] = byte(i >> 8)
-	id[11] = byte(i)
-
+	id[9], id[10], id[11]  = byte(i >> 16), byte(i >> 8), byte(i)
 	id[0] = mid ^ id[9]
 
 	binary.BigEndian.PutUint64(id[1:], uint64(time.Now().UnixNano()))
 
 	id[1], id[6], id[2], id[5] = id[6], id[1], id[5], id[2]
-
-	id[7] = byte(pid>>8)
-	id[8] = byte(pid)
+	id[7], id[8] = byte(pid >> 8), byte(pid)
 
 	return id
 }
@@ -81,17 +78,34 @@ func (id ID) MarshalText() ([]byte, error) {
 }
 
 func (id *ID) UnmarshalText(text []byte) error {
-	if len(text) != encodedLength {
-		return ErrInvalidID
-	}
-	for _, c := range text {
-		if dec[c] == 0xFF {
-			return ErrInvalidID
+	if len(text) == encodedLength {
+		for _, c := range text {
+			if dec[c] == 0xFF {
+				return ErrInvalidID
+			}
 		}
+		decode(id, text)
+		return nil
+	} else if len(text) == numeralLength {
+		return decodeNumeral(id, text)
 	}
-	decode(id, text)
-	return nil
+	return ErrInvalidID
 }
+
+func (id ID) NumeralString() string {
+	buf := new(bytes.Buffer)
+	for _,b := range id[:] {
+		if b < 100 {
+			buf.WriteByte('0')
+		}
+		if b < 10 {
+			buf.WriteByte('0')
+		}
+		buf.WriteString(strconv.FormatUint(uint64(b), 10))
+	}
+	return buf.String()
+}
+
 
 func (id ID) Counter() uint32 {
 	b := id[9:12]
@@ -204,6 +218,20 @@ func decode(id *ID, src []byte) {
 	id[9] = dec[src[14]]<<5 | dec[src[15]]
 	id[10] = dec[src[16]]<<3 | dec[src[17]]>>2
 	id[11] = dec[src[17]]<<6 | dec[src[18]]<<1 | dec[src[19]]>>4
+}
+
+func decodeNumeral(id *ID, src []byte) error {
+	if len(src) % 3 != 0 {
+		return ErrInvalidID
+	}
+	for i, pos := 0, 0; i < len(src); i, pos = i + 3, pos + 1 {
+		b, err := strconv.ParseUint(string(src[i:i+3]), 10, 8)
+		if err != nil {
+			return err
+		}
+		id[pos] = uint8(b)
+	}
+	return nil
 }
 
 func init() {
