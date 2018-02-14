@@ -18,7 +18,7 @@ const (
 	rawLength     = 12
 	encodedLength = 20
 	numeralLength = rawLength * 3
-	charset       = "0123456789abcdefghijklmnopqrstuv"
+	charset       = "0123456789abcdefghikmnopqrstwxyz"
 )
 
 var (
@@ -182,6 +182,7 @@ func NewSource() *Source {
 	}
 }
 
+// From https://github.com/rs/xid
 func encode(dst, id []byte) {
 	dst[0] = charset[id[0]>>3]
 	dst[1] = charset[(id[1]>>6)&0x1F|(id[0]<<2)&0x1F]
@@ -205,6 +206,7 @@ func encode(dst, id []byte) {
 	dst[19] = charset[(id[11]<<4)&0x1F]
 }
 
+// From https://github.com/rs/xid
 func decode(id *ID, src []byte) {
 	id[0] = dec[src[0]]<<3 | dec[src[1]]>>2
 	id[1] = dec[src[1]]<<6 | dec[src[2]]<<1 | dec[src[3]]>>4

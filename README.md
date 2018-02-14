@@ -10,13 +10,13 @@ Use 6 byte `time.UnixNano()` for submission time. You can use for SQL.
 
 ```go
 fmt.Println(rid.New())
-// -> krt54gkt2cakckbs0lm0
+// -> i3kzyinz2camp6sao92g
 
 fmt.Println(rid.New().String())
-// -> 04on0ige2cakmeerdk70
+// -> r3f8mio72campc8imey0
 
 fmt.Println(rid.New().NumeralString())
-// -> 019052254074015019021075067201137063
+// -> 061048162074200019021075187231093081
 
 ```
 
