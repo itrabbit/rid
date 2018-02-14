@@ -32,3 +32,8 @@ id.Time()   // With an accuracy of up to 6 bytes (from 8)
 id.Counter() 
 ```
 
+## License and copyright
+
+Copyright (c) 2018 IT Rabbit.
+
+**[Original encode/decode algorithm](https://github.com/rs/xid):** Copyright (c) 2015 Olivier Poitrey <rs@dailymotion.com>. The same MIT license applies.
