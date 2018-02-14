@@ -37,7 +37,7 @@ var (
 )
 
 
-// 1 byte - Hardware Address CRC ID
+// 1 byte - Hardware Address CRC ID xor first byte Counter
 // 6 byte - Nanoseconds Time without last 2 byte, and use swap 1 <-> 6, 2 <-> 5 bytes
 // 2 byte - PID Process
 // 3 byte - Counter

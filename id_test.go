@@ -6,6 +6,26 @@ import (
 	"time"
 )
 
+func TestRandomUint32(t *testing.T)  {
+	if b := randUint32(); b == 0 {
+		t.Fail()
+		return
+	}
+}
+
+func TestID_IsNil(t *testing.T) {
+	id := New()
+	if id.IsNil() {
+		t.Fail()
+		return
+	}
+
+	id = ID{}
+	if !id.IsNil() {
+		t.Fail()
+		return
+	}
+}
 
 func TestNumeralString(t *testing.T)  {
 	src := New()
@@ -78,6 +98,20 @@ func BenchmarkNewString(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkNewInfo(b *testing.B) {
+	fmt.Println("BenchmarkNewInfo")
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			id := New()
+			id.Mid()
+			id.Pid()
+			id.Time()
+			id.Counter()
+		}
+	})
+}
+
 
 func BenchmarkNewNumeralString(b *testing.B) {
 	fmt.Println("BenchmarkNewNumeralString")
