@@ -8,29 +8,25 @@ import (
 
 func TestIDInfo(t *testing.T) {
 	s := GlobalSource()
-
-	now := time.Now()
-	id := New()
-
-	fmt.Println(id)
+	id, now := New(), time.Now()
 
 	if id.Counter() != s.Counter() {
-		fmt.Println("Invalid counter")
+		fmt.Println("[ERROR] Invalid counter")
 		t.Fail()
 		return
 	}
 	if id.Mid() != mid {
-		fmt.Println("Invalid NID")
+		fmt.Println("[ERROR] Invalid NID")
 		t.Fail()
 		return
 	}
 	if id.Pid() != uint16(pid) {
-		fmt.Println("Invalid PID")
+		fmt.Println("[ERROR] Invalid PID")
 		t.Fail()
 		return
 	}
 	if id.Time().Unix() != now.Unix() {
-		fmt.Println("Invalid Timestamp")
+		fmt.Println("[ERROR] Invalid Timestamp")
 		t.Fail()
 		return
 	}
@@ -42,8 +38,7 @@ func TestEncodeDecode(t *testing.T) {
 		id = New()
 		cid, _ = FromString(id.String())
 		if id != cid {
-			fmt.Println(id[:])
-			fmt.Println(cid[:])
+			fmt.Println("[ERROR]", id[:], " != ", cid[:])
 			t.Fail()
 			return
 		}
@@ -70,6 +65,14 @@ func BenchmarkFromString(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			_, _ = FromString("krt54gkt2cakckbs0lm0")
+		}
+	})
+}
+
+func BenchmarkFromNewString(b *testing.B) {
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_, _ = FromString(New().String())
 		}
 	})
 }

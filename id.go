@@ -62,8 +62,8 @@ func (s *Source) NewID() ID {
 
 	id[1], id[6], id[2], id[5] = id[6], id[1], id[5], id[2]
 
-	id[7] = byte(pid>>8) ^ id[10]
-	id[8] = byte(pid) ^ id[11]
+	id[7] = byte(pid>>8)
+	id[8] = byte(pid)
 
 	return id
 }
@@ -103,10 +103,7 @@ func (id ID) Mid() uint8 {
 }
 
 func (id ID) Pid() uint16 {
-	return binary.BigEndian.Uint16([]byte{
-		id[7] ^ id[10],
-		id[8] ^ id[11],
-	})
+	return binary.BigEndian.Uint16(id[7:9])
 }
 
 func (id ID) Time() time.Time {
