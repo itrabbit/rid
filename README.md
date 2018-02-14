@@ -1,6 +1,6 @@
-# Simple Unique ID Generator
+# Unique ID Generator
 
-Use 6 byte time.UnixNano() for submission time. Just use the XOR operation of the counter value
+Use 6 byte `time.UnixNano()` for submission time
 
 ## Install
 
@@ -9,15 +9,14 @@ Use 6 byte time.UnixNano() for submission time. Just use the XOR operation of th
 ## Usage
 
 ```go
-id := rid.New()
-
-println(id.String())
+fmt.Println(rid.New())
 // -> krt54gkt2cakckbs0lm0
 ```
 
 Get embedded info:
 
 ```go
+id := rid.New()
 id.Mid() // Hardware Address CRC ID
 id.Pid() // Process Pid
 id.Time()
