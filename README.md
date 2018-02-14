@@ -1,6 +1,6 @@
 # Unique ID Generator
 
-Use 6 byte `time.UnixNano()` for submission time
+Use 6 byte `time.UnixNano()` for submission time. You can use for SQL.
 
 ## Install
 
@@ -11,15 +11,24 @@ Use 6 byte `time.UnixNano()` for submission time
 ```go
 fmt.Println(rid.New())
 // -> krt54gkt2cakckbs0lm0
+
+fmt.Println(rid.New().String())
+// -> 04on0ige2cakmeerdk70
+
+fmt.Println(rid.New().NumeralString())
+// -> 019052254074015019021075067201137063
+
 ```
 
 Get embedded info:
 
 ```go
 id := rid.New()
-id.Mid() // Hardware Address CRC ID
-id.Pid() // Process Pid
-id.Time()
+
+id.Mid()    // Hardware Address CRC ID
+id.Pid()    // Process Pid
+id.Time()   // With an accuracy of up to 6 bytes (from 8)
+
 id.Counter() 
 ```
 
