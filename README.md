@@ -2,6 +2,8 @@
 
 Use 6 byte for submission time (UTC). You can use for SQL.
 
+**! Limit values to 2310 year.**
+
 #### Identifier structure:
 
 - `4-byte` value representing the seconds since the 2018-01-01 epoch

@@ -14,6 +14,14 @@ func TestRandomUint32(t *testing.T)  {
 	}
 }
 
+func TestEpochCapacity(t *testing.T)  {
+	ns := uint64(0x7FFFFFFFFFFFFFFF)
+	if getEpoch().Add(time.Duration(ns)).Year() != 2310 {
+		t.Fail()
+		return
+	}
+}
+
 func TestNanosecondsAccuracy(t *testing.T)  {
 
 	ns := time.Now().Sub(epoch).Nanoseconds()
