@@ -4,10 +4,34 @@ import (
 	"fmt"
 	"testing"
 	"time"
+	"encoding/binary"
 )
 
 func TestRandomUint32(t *testing.T)  {
 	if b := randUint32(); b == 0 {
+		t.Fail()
+		return
+	}
+}
+
+func TestNanosecondsAccuracy(t *testing.T)  {
+	ns := time.Now().Nanosecond()
+
+	var b [4]byte
+
+	b[0] = byte(ns >> 24)
+	b[1] = byte(ns >> 16)
+	b[2] = byte(ns >> 8)
+	b[3] = byte(ns >> 0)
+
+	short := int(binary.BigEndian.Uint32([]byte{
+		b[0],
+		b[1],
+		0,
+		0,
+	}))
+
+	if (short * 100 / ns) < 90 {
 		t.Fail()
 		return
 	}
@@ -19,7 +43,6 @@ func TestID_IsNil(t *testing.T) {
 		t.Fail()
 		return
 	}
-
 	id = ID{}
 	if !id.IsNil() {
 		t.Fail()

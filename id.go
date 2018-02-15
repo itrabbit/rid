@@ -40,7 +40,7 @@ var (
 // 1-byte hardware address CRC4 ID
 // 2-byte process id
 // 3-byte counter
-// 2-byte nanoseconds
+// 2-byte nanoseconds (the first 2 bytes of the four byte value)
 type ID [rawLength]byte
 
 type Source struct {
@@ -57,14 +57,16 @@ func (s *Source) Seed(pos uint32) {
 
 func (s *Source) NewID() ID {
 
-	i, id := atomic.AddUint32(&s.counter, 1), ID{}
+	i, id, now := atomic.AddUint32(&s.counter, 1), ID{}, time.Now()
 
-	binary.BigEndian.PutUint64(id[0:], uint64(time.Now().UnixNano()))
-
-	id[10], id[11] = id[4], id[5]
+	binary.BigEndian.PutUint32(id[0:], uint32(now.Unix()))
 
 	id[4], id[5], id[6] = mid, byte(pid >> 8), byte(pid)
 	id[7], id[8], id[9]  = byte(i >> 16), byte(i >> 8), byte(i)
+
+	ns := now.Nanosecond()
+	id[10] = byte(ns >> 24)
+	id[11] = byte(ns >> 16)
 
 	return id
 }
@@ -125,17 +127,14 @@ func (id ID) Pid() uint16 {
 }
 
 func (id ID) Time() time.Time {
-	nsec := int64(binary.BigEndian.Uint64([]byte{
-		id[0],
-		id[1],
-		id[2],
-		id[3],
+	sec := int64(binary.BigEndian.Uint32(id[0:4]))
+	nsec := int64(binary.BigEndian.Uint32([]byte{
 		id[10],
 		id[11],
 		0,
 		0,
 	}))
-	return time.Unix(0, nsec)
+	return time.Unix(sec, nsec)
 }
 
 func (id ID) IsNil() bool {
