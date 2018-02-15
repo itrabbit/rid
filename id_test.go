@@ -60,6 +60,9 @@ func TestID_IsNil(t *testing.T) {
 
 func TestNumeralString(t *testing.T)  {
 	src := New()
+
+	fmt.Println(src, src.NumeralString(), src.Time())
+
 	id, err := FromString(src.NumeralString())
 	if err != nil {
 		fmt.Println(err.Error())
@@ -157,7 +160,7 @@ func BenchmarkFromString(b *testing.B) {
 	fmt.Println("BenchmarkFromString")
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, _ = FromString("006yxfysaq0bynaq2070")
+			_, _ = FromString("t9eti00dzt0e0hkibo9g")
 		}
 	})
 }

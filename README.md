@@ -6,11 +6,11 @@ Use 6 byte for submission time (UTC). You can use for SQL.
 
 #### Identifier structure:
 
-- `4-byte` value representing the seconds since the 2018-01-01 epoch
-
 - `1-byte` hardware address CRC4 ID
 
 - `2-byte` process id
+
+- `4-byte` value representing the seconds since the 2018-01-01 epoch
 
 - `3-byte` counter (random, or manual)
 
@@ -24,13 +24,13 @@ Use 6 byte for submission time (UTC). You can use for SQL.
 
 ```go
 fmt.Println(rid.New())
-// -> 006yxbosapiby5gfy6gg
+// -> t9eti00dzt0e0hkibo9g
 
 fmt.Println(rid.New().String())
-// -> 006yxfysaq0bynaq2070
+// -> t9ew400dzt1db4okkw80
 
 fmt.Println(rid.New().NumeralString())
-// -> 000013238191218086000191085088016014
+// -> 218093205000013254195242051055202176
 ```
 
 Custom source:

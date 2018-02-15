@@ -38,9 +38,9 @@ var (
 	ErrInvalidID = errors.New("invalid ID")
 )
 
-// 4-byte value representing the seconds since the Unix epoch
-// 1-byte hardware address CRC4 ID
 // 2-byte process id
+// 1-byte hardware address CRC4 ID
+// 4-byte value representing the seconds since the Unix epoch
 // 3-byte counter
 // 2-byte nanoseconds (the first 2 bytes of the four byte value)
 type ID [rawLength]byte
@@ -61,16 +61,20 @@ func (s *Source) NewID() ID {
 
 	i, id, ns := atomic.AddUint32(&s.counter, 1), ID{}, time.Now().Sub(epoch).Nanoseconds()
 
-	id[0] = byte(ns >> 56)
-	id[1] = byte(ns >> 48)
-	id[2] = byte(ns >> 40)
-	id[3] = byte(ns >> 32)
-	id[4] = mid
-	id[5] = byte(pid >> 8)
-	id[6] = byte(pid)
+	id[0] = mid
+
+	id[1] = byte(pid >> 8)
+	id[2] = byte(pid)
+
+	id[3] = byte(ns >> 56)
+	id[4] = byte(ns >> 48)
+	id[5] = byte(ns >> 40)
+	id[6] = byte(ns >> 32)
+
 	id[7] = byte(i >> 16)
 	id[8] = byte(i >> 8)
 	id[9] = byte(i)
+
 	id[10] = byte(ns >> 24)
 	id[11] = byte(ns >> 16)
 
@@ -130,16 +134,16 @@ func (id ID) Counter() uint32 {
 }
 
 func (id ID) Mid() uint8 {
-	return id[4]
+	return id[0]
 }
 
 func (id ID) Pid() uint16 {
-	return binary.BigEndian.Uint16(id[5:7])
+	return binary.BigEndian.Uint16(id[1:3])
 }
 
 func (id ID) Time() time.Time {
 	ns := uint64(0) | uint64(0)<<8 | uint64(id[11])<<16 | uint64(id[10])<<24 |
-		  uint64(id[3])<<32 | uint64(id[2])<<40 | uint64(id[1])<<48 | uint64(id[0])<<56
+		  uint64(id[6])<<32 | uint64(id[5])<<40 | uint64(id[4])<<48 | uint64(id[3])<<56
 
 	return getEpoch().Add(time.Duration(ns))
 }
