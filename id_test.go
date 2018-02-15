@@ -150,7 +150,7 @@ func BenchmarkFromString(b *testing.B) {
 	fmt.Println("BenchmarkFromString")
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, _ = FromString("2m9p3besa0bo6mtqdss0")
+			_, _ = FromString("006yxfysaq0bynaq2070")
 		}
 	})
 }
