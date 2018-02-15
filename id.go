@@ -36,11 +36,11 @@ var (
 	ErrInvalidID = errors.New("invalid ID")
 )
 
-
-// 1 byte - Hardware Address CRC ID xor first byte Counter
-// 6 byte - Nanoseconds Time without last 2 byte, and use swap 1 <-> 6, 2 <-> 5 bytes
-// 2 byte - PID Process
-// 3 byte - Counter
+// 4-byte value representing the seconds since the Unix epoch
+// 1-byte hardware address CRC4 ID
+// 2-byte process id
+// 3-byte counter
+// 2-byte nanoseconds
 type ID [rawLength]byte
 
 type Source struct {
@@ -59,13 +59,12 @@ func (s *Source) NewID() ID {
 
 	i, id := atomic.AddUint32(&s.counter, 1), ID{}
 
-	id[9], id[10], id[11]  = byte(i >> 16), byte(i >> 8), byte(i)
-	id[0] = mid ^ id[9]
+	binary.BigEndian.PutUint64(id[0:], uint64(time.Now().UnixNano()))
 
-	binary.BigEndian.PutUint64(id[1:], uint64(time.Now().UnixNano()))
+	id[10], id[11] = id[4], id[5]
 
-	id[1], id[6], id[2], id[5] = id[6], id[1], id[5], id[2]
-	id[7], id[8] = byte(pid >> 8), byte(pid)
+	id[4], id[5], id[6] = mid, byte(pid >> 8), byte(pid)
+	id[7], id[8], id[9]  = byte(i >> 16), byte(i >> 8), byte(i)
 
 	return id
 }
@@ -113,26 +112,26 @@ func (id ID) NumeralString() string {
 
 
 func (id ID) Counter() uint32 {
-	b := id[9:12]
+	b := id[7:10]
 	return uint32(b[0])<<16 | uint32(b[1])<<8 | uint32(b[2])
 }
 
 func (id ID) Mid() uint8 {
-	return id[0] ^ id[9]
+	return id[4]
 }
 
 func (id ID) Pid() uint16 {
-	return binary.BigEndian.Uint16(id[7:9])
+	return binary.BigEndian.Uint16(id[5:7])
 }
 
 func (id ID) Time() time.Time {
 	nsec := int64(binary.BigEndian.Uint64([]byte{
-		id[6],
-		id[5],
-		id[3],
-		id[4],
-		id[2],
+		id[0],
 		id[1],
+		id[2],
+		id[3],
+		id[10],
+		id[11],
 		0,
 		0,
 	}))
