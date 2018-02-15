@@ -177,6 +177,9 @@ func (id *ID) Scan(value interface{}) (err error) {
 }
 
 func FromString(id string) (ID, error) {
+	if len(id) < 1 {
+		return ID{}, nil
+	}
 	i := &ID{}
 	err := i.UnmarshalText([]byte(id))
 	return *i, err
