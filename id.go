@@ -100,6 +100,11 @@ func (id *ID) UnmarshalText(text []byte) error {
 		return nil
 	} else if len(text) == numeralLength {
 		return decodeNumeral(id, text)
+	} else if len(text) == rawLength {
+		_, _ = id[11], text[11]
+		for i, b := range text {
+			id[i] = b
+		}
 	}
 	return ErrInvalidID
 }
