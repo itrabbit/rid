@@ -60,9 +60,6 @@ func TestID_IsNil(t *testing.T) {
 
 func TestNumeralString(t *testing.T)  {
 	src := New()
-
-	fmt.Println(src, src.NumeralString(), src.Time())
-
 	id, err := FromString(src.NumeralString())
 	if err != nil {
 		fmt.Println(err.Error())
@@ -86,7 +83,7 @@ func TestIDInfo(t *testing.T) {
 		return
 	}
 	if id.Mid() != Mid() {
-		fmt.Println("[ERROR] Invalid NID")
+		fmt.Println("[ERROR] Invalid MID")
 		t.Fail()
 		return
 	}

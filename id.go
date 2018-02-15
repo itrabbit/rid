@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	version		  = byte(11)
 	rawLength     = 12
 	encodedLength = 20
 	numeralLength = rawLength * 3
@@ -38,8 +39,8 @@ var (
 	ErrInvalidID = errors.New("invalid ID")
 )
 
-// 2-byte process id
 // 1-byte hardware address CRC4 ID
+// 2-byte process id
 // 4-byte value representing the seconds since the Unix epoch
 // 3-byte counter
 // 2-byte nanoseconds (the first 2 bytes of the four byte value)
@@ -61,7 +62,7 @@ func (s *Source) NewID() ID {
 
 	i, id, ns := atomic.AddUint32(&s.counter, 1), ID{}, time.Now().Sub(epoch).Nanoseconds()
 
-	id[0] = mid
+	id[0] = mid ^ version
 
 	id[1] = byte(pid >> 8)
 	id[2] = byte(pid)
@@ -134,7 +135,7 @@ func (id ID) Counter() uint32 {
 }
 
 func (id ID) Mid() uint8 {
-	return id[0]
+	return id[0] ^ version
 }
 
 func (id ID) Pid() uint16 {
