@@ -15,8 +15,7 @@ func TestRandomUint32(t *testing.T)  {
 }
 
 func TestEpochCapacity(t *testing.T)  {
-	ns := uint64(0x7FFFFFFFFFFFFFFF)
-	if getEpoch().Add(time.Duration(ns)).Year() != 2310 {
+	if getEpoch().Add(time.Duration(uint64(0x7FFFFFFFFFFFFFFF))).Year() != 2310 {
 		t.Fail()
 		return
 	}

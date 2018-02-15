@@ -272,6 +272,8 @@ func init() {
 	if pid == 1 {
 		if b, err := ioutil.ReadFile("/proc/1/cpuset"); err == nil && len(b) > 1 {
 			pid = int(crc32.ChecksumIEEE(b))
+		} else {
+			pid = int(randUint32())
 		}
 	}
 }
