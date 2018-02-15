@@ -153,6 +153,18 @@ func (id ID) Value() (driver.Value, error) {
 	return string(b), err
 }
 
+func (ID) SqlType(dialect string, size int, settings map[string]string) string {
+	switch dialect {
+	case "mysql":
+		if _, ok := settings["NOT NULL"]; ok {
+			return "BINARY(12)"
+		}
+		return "BINARY(12) NULL"
+	default:
+		return "VARCHAR(20)"
+	}
+}
+
 func (id *ID) Scan(value interface{}) (err error) {
 	switch val := value.(type) {
 	case string:
