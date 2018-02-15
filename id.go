@@ -157,9 +157,9 @@ func (ID) SqlType(dialect string, size int, settings map[string]string) string {
 	switch dialect {
 	case "mysql":
 		if _, ok := settings["NOT NULL"]; ok {
-			return "BINARY(12)"
+			return "VARCHAR(20)"
 		}
-		return "BINARY(12) NULL"
+		return "VARCHAR(20) NULL"
 	default:
 		return "VARCHAR(20)"
 	}
