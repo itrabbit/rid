@@ -14,5 +14,5 @@ func getMid() uint8 {
 			}
 		}
 	}
-	return calcCRC4([]byte{0, 0, 0, 0, 0, 128})
+	return calcCRC4([]byte{0, 0, 0, 0, uint8(randUint32()), uint8(randUint32())})
 }
