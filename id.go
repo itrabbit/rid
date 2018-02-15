@@ -27,6 +27,8 @@ var (
 
 	source = NewSource()
 
+	epoch = getEpoch()
+
 	dec [256]byte
 )
 
@@ -57,14 +59,18 @@ func (s *Source) Seed(pos uint32) {
 
 func (s *Source) NewID() ID {
 
-	i, id, now := atomic.AddUint32(&s.counter, 1), ID{}, time.Now()
+	i, id, ns := atomic.AddUint32(&s.counter, 1), ID{}, time.Now().Sub(epoch).Nanoseconds()
 
-	binary.BigEndian.PutUint32(id[0:], uint32(now.Unix()))
-
-	id[4], id[5], id[6] = mid, byte(pid >> 8), byte(pid)
-	id[7], id[8], id[9]  = byte(i >> 16), byte(i >> 8), byte(i)
-
-	ns := now.Nanosecond()
+	id[0] = byte(ns >> 56)
+	id[1] = byte(ns >> 48)
+	id[2] = byte(ns >> 40)
+	id[3] = byte(ns >> 32)
+	id[4] = mid
+	id[5] = byte(pid >> 8)
+	id[6] = byte(pid)
+	id[7] = byte(i >> 16)
+	id[8] = byte(i >> 8)
+	id[9] = byte(i)
 	id[10] = byte(ns >> 24)
 	id[11] = byte(ns >> 16)
 
@@ -127,14 +133,10 @@ func (id ID) Pid() uint16 {
 }
 
 func (id ID) Time() time.Time {
-	sec := int64(binary.BigEndian.Uint32(id[0:4]))
-	nsec := int64(binary.BigEndian.Uint32([]byte{
-		id[10],
-		id[11],
-		0,
-		0,
-	}))
-	return time.Unix(sec, nsec)
+	ns := uint64(0) | uint64(0)<<8 | uint64(id[11])<<16 | uint64(id[10])<<24 |
+		  uint64(id[3])<<32 | uint64(id[2])<<40 | uint64(id[1])<<48 | uint64(id[0])<<56
+
+	return getEpoch().Add(time.Duration(ns))
 }
 
 func (id ID) IsNil() bool {
@@ -237,6 +239,10 @@ func decodeNumeral(id *ID, src []byte) error {
 		id[pos] = uint8(b)
 	}
 	return nil
+}
+
+func getEpoch() time.Time {
+	return time.Date(2018, time.January, 1, 0, 0, 0, 0, time.UTC)
 }
 
 func init() {

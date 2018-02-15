@@ -1,10 +1,10 @@
 # Unique ID Generator
 
-Use 6 byte for submission time. You can use for SQL.
+Use 6 byte for submission time (UTC). You can use for SQL.
 
 #### Identifier structure:
 
-- `4-byte` value representing the seconds since the Unix epoch
+- `4-byte` value representing the seconds since the 2018-01-01 epoch
 
 - `1-byte` hardware address CRC4 ID
 
@@ -22,13 +22,13 @@ Use 6 byte for submission time. You can use for SQL.
 
 ```go
 fmt.Println(rid.New())
-// -> 2m9p2o6s9xp0561dedpg
+// -> 006yxbosapiby5gfy6gg
 
 fmt.Println(rid.New().String())
-// -> 2m9p2pys9xxih20bgc1g
+// -> 006yxfysaq0bynaq2070
 
 fmt.Println(rid.New().NumeralString())
-// -> 021019113097218079133204240151147014
+// -> 000013238191218086000191085088016014
 ```
 
 Custom source:

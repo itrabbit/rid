@@ -15,21 +15,22 @@ func TestRandomUint32(t *testing.T)  {
 }
 
 func TestNanosecondsAccuracy(t *testing.T)  {
-	ns := time.Now().Nanosecond()
 
-	var b [4]byte
+	ns := time.Now().Sub(epoch).Nanoseconds()
 
-	b[0] = byte(ns >> 24)
-	b[1] = byte(ns >> 16)
-	b[2] = byte(ns >> 8)
-	b[3] = byte(ns >> 0)
+	var b [8]byte
 
-	short := int(binary.BigEndian.Uint32([]byte{
-		b[0],
-		b[1],
-		0,
-		0,
-	}))
+	_ = b[7]
+	b[0] = byte(ns >> 56)
+	b[1] = byte(ns >> 48)
+	b[2] = byte(ns >> 40)
+	b[3] = byte(ns >> 32)
+	b[4] = byte(ns >> 24)
+	b[5] = byte(ns >> 16)
+	b[6] = 0
+	b[7] = 0
+
+	short := int64(binary.BigEndian.Uint64(b[:]))
 
 	if (short * 100 / ns) < 90 {
 		t.Fail()
