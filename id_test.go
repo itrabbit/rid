@@ -5,7 +5,36 @@ import (
 	"testing"
 	"time"
 	"encoding/binary"
+	"encoding/json"
 )
+
+func TestJsonMarshalUnmarshal(t *testing.T)  {
+	type test struct {
+		ID ID `json:"id"`
+		Name string `json:"name"`
+	}
+	a := test{
+		ID: New(),
+		Name: "Test",
+	}
+	d, err := json.Marshal(a)
+	if err != nil {
+		fmt.Println(err.Error())
+		t.Fail()
+		return
+	}
+	var b test
+	err = json.Unmarshal(d, &b)
+	if err != nil {
+		fmt.Println(err.Error())
+		t.Fail()
+		return
+	}
+	if a.ID != b.ID {
+		t.Fail()
+		return
+	}
+}
 
 func TestRandomUint32(t *testing.T)  {
 	if b := randUint32(); b == 0 {
