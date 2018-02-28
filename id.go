@@ -154,6 +154,9 @@ func (id ID) IsNil() bool {
 }
 
 func (id ID) Value() (driver.Value, error) {
+	if id.IsNil() {
+		return nil, nil
+	}
 	b, err := id.MarshalText()
 	return string(b), err
 }
@@ -171,14 +174,17 @@ func (ID) SqlType(dialect string, size int, settings map[string]string) string {
 }
 
 func (id *ID) Scan(value interface{}) (err error) {
-	switch val := value.(type) {
-	case string:
-		return id.UnmarshalText([]byte(val))
-	case []byte:
-		return id.UnmarshalText(val)
-	default:
-		return fmt.Errorf("scanning unsupported type: %T", value)
+	if value != nil {
+		switch val := value.(type) {
+		case string:
+			return id.UnmarshalText([]byte(val))
+		case []byte:
+			return id.UnmarshalText(val)
+		default:
+			return fmt.Errorf("scanning unsupported type: %T", value)
+		}
 	}
+	return
 }
 
 func FromString(id string) (ID, error) {
